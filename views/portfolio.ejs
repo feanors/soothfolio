@@ -1,0 +1,108 @@
+<%- include("partials/header") -%>
+    
+    <div class="table-responsive-sm table-wrapper highlighted">
+        <table class="table table-dark table-borderless mb-0">
+            <thead>
+                <tr>
+                    <th style="padding-left: 3rem;" scope="col">Icon</th>
+                    <th scope="col">Coin Name</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Avg Cost</th>
+                    <th scope="col">Current Price</th>
+                    <th scope="col">Total Worth</th>
+                    <th scope="col">Percentage Gain</th>
+                    <th scope="col">Gainz</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for (const [key, value] of coinz.entries()) { %>
+                <tr>  
+                    <td style="padding-left: 3rem;"> <img style="max-width: 2rem; max-height: 2rem;" src=<%= key.image %>  alt=""> </td>
+                    <td> <%= key.name  %> </td>
+                    <td> <%= value.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")  %> </td>
+                    <td> <%= value.pricePaid.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") %> $</td>
+                    <td> <%=(key.price).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") %> $</td>
+                    <td> <%= (key.price * value.amount).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") %> $</td>
+                    <% if( ((( key.price - value.pricePaid ) / value.pricePaid) * 100) >= 0) { %>
+                    <td class="text-green"> <%= ((( key.price - value.pricePaid ) / value.pricePaid) * 100).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") %>% </td>
+                    <% } else { %>
+                    <td class="text-red""> <%= ((( key.price - value.pricePaid ) / value.pricePaid) * 100).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") %>% </td>
+                    <% } %>
+
+                    <% if( (value.amount * key.price - value.amount * value.pricePaid) >= 0) { %>
+                    <td class="text-green"> <%= (value.amount * key.price - value.amount * value.pricePaid).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") %> $</td>
+                    <% } else { %>
+                    <td class="text-red""> <%= (value.amount * key.price - value.amount * value.pricePaid).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") %> $</td>
+                    <% } %>
+                </tr>
+                <% } %>
+            </tbody>
+            <tfoot>
+                <tr style="height: 3rem;">
+                    <td style="padding-left: 3rem;"></td>
+                    <td>TOTAL</td>
+                    <td colspan="3"></td>
+                    <td><%= totalWorth.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")%> $</td>
+                    <td></td>
+                    <% if(totalGainz >= 0) { %>
+                    <td class="text-green"><%= totalGainz.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")%> $</td>
+                    <% } else { %>
+                    <td class="text-red"><%= totalGainz.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")%> $</td>
+                    <% } %>
+                <tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div id="add-form" class="highlighted curved popup hidden">  
+        <form action="/add" method="POST">
+            <div class="input">
+                <label class="text">Coin Name:</label>
+                <select class="form-control curved" name=coinName placeholder="Coin Name" id="exampleFormControlSelect1">
+                <% for(var [key, val] of allCoinz) { %>
+                    <option><%= key %></option>
+                <% } %>
+                </select>
+                <label class="text">Amount:</label>
+                <input type="text" name="coinAmount" class="form-control curved">
+                <label class="text">Purchase Date:</label>
+                <input type="date" name="datePurchased" class="form-control curved">
+                <div style="float: right; margin-top: 1rem;">
+                    <button class="curved btn btn-md btn-outline-success min-size-2" >Add</button>
+                    <button id="close-add-form" class="curved btn btn-md btn-outline-danger"" type="button">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div id="remove-form" class="highlighted curved popup hidden">  
+        <form action="/remove" method="POST">
+            <div class="input">
+                <label class="text">Coin Name:</label>
+                <select class="form-control curved" name=coinName placeholder="Coin Name" id="exampleFormControlSelect1">
+                <% for(var [key, val] of allCoinz) { %>
+                    <option><%= key %></option>
+                <% } %>
+                </select>
+                <label class="text">Amount:</label>
+                <input type="text" name="coinAmount" class="form-control curved">
+                <div style="float: right; margin-top: 1rem;">
+                    <button class="curved btn btn-md btn-outline-danger min-size-2" >Remove</button>
+                    <button id="close-remove-form" class="curved btn btn-md btn-outline-success"" type="button">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    
+    <div id="control-div" class="mid-aligned" style="margin-top: 3%;">
+        <button id="add-button" class="highlighted curved btn btn-md btn-success min-size-3">Add</button>
+        <button id="remove-button" class="highlighted curved btn btn-md btn-danger">Remove</button>
+    </div>
+
+    <script src="/index.js"></script>
+
+    
+
+<%- include("partials/footer") -%>
