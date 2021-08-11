@@ -16,10 +16,11 @@ exports.fetchUserCoinMap = async function(CoinSchema, userID, allCoinz, callback
             for (const [key, value] of map.entries()) { 
                 userCoinMap.set(allCoinz.get(key), value);
             }
-        }
+        }    
 
-        userCoinMap = new Map([...userCoinMap.entries()].sort((a, b) => b[0].price*b[1].amount - a[0].price*a[1].amount));
-    
+        // userCoinMap = new Map([...userCoinMap.entries()].sort(function(a, b) { if(a[0] && b[0]) { b[0].price*b[1].amount - a[0].price*a[1].amount;}}));
+        // need to fix this with undefined check, needed due to modified html input, will left unsorted for now
+
         callback(userCoinMap);
     });
 }
@@ -81,7 +82,8 @@ exports.totalWorth = function (coinz) {
     let worth = 0;
 
     for (const [key, value] of coinz.entries()) {
-        worth += key.price * value.amount;
+        if(key)
+            worth += key.price * value.amount;
     }
 
     return worth;
@@ -92,7 +94,8 @@ exports.totalGainz = function (coinz) {
     let spent = 0;
     
     for (const [key, value] of coinz.entries()) {
-        spent += value.pricePaid * value.amount;
+        if(key)
+            spent += value.pricePaid * value.amount;
     }
 
     return exports.totalWorth(coinz) - spent;

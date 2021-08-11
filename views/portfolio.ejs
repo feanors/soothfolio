@@ -16,6 +16,7 @@
             </thead>
             <tbody>
                 <% for (const [key, value] of coinz.entries()) { %>
+                    <% if(key) { %>
                 <tr>  
                     <td style="padding-left: 3rem;"> <img style="max-width: 2rem; max-height: 2rem;" src=<%= key.image %>  alt=""> </td>
                     <td> <%= key.name  %> </td>
@@ -35,6 +36,7 @@
                     <td class="text-red""> <%= (value.amount * key.price - value.amount * value.pricePaid).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") %> $</td>
                     <% } %>
                 </tr>
+                    <% } %>
                 <% } %>
             </tbody>
             <tfoot>
