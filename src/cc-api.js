@@ -1,3 +1,4 @@
+const { kMaxLength } = require("buffer");
 const https = require("https");
 
 const urlAllCoins = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false&price_change_percentage=7d";
@@ -9,31 +10,42 @@ function coinDefault(id, name, price, image) {
     this.image = image;
 }
 
-exports.getAllCoinData = (allCoinz, priceOnly) => { 
+exports.updatePrices = (userCoinMap, callback) => {
+
+    queryStringForCoinIdList = ""
+    for (const [key, value] of userCoinMap.entries()) {
+        queryStringForCoinIdList += key.id + ',';  // the last comma here is not a problem
+    }
+
+    priceRequestURL = "https://api.coingecko.com/api/v3/simple/price?ids=" + queryStringForCoinIdList + "&vs_currencies=usd";
+    requestParser(priceRequestURL, (parsedData) => {
+        for (const [key, value] of userCoinMap.entries()) {
+            key.price = parsedData[key.id].usd
+        }
+
+        callback();
+    });
+    
+}
+
+exports.getAllCoinData = (allCoinz) => { 
 
     requestParser(urlAllCoins, (parsedData) => {
-        for (var i = 0; i < parsedData.length; i++) {
+        for (let i = 0; i < parsedData.length; i++) {
 
             let id = parsedData[i].id;
             let price = parsedData[i].current_price;
-
-            if(priceOnly && allCoinz.has(id)) {
-                allCoinz.get(id).price = price;
-                
-            } else {
-                let name = parsedData[i].name;
-                let image = parsedData[i].image;
-                allCoinz.set(id, new coinDefault(id, name, price, image));
-            }
+            let name = parsedData[i].name;
+            let image = parsedData[i].image;
+            allCoinz.set(id, new coinDefault(id, name, price, image));   
         }
     });    
 }
 
 function requestParser(url, callback) {
-    var parsedData;
+    let parsedData;
     https.get(url, (res) => {
-
-        let body = "";
+    let body = "";
     
         res.on("data", (data) => {
             body += data;
@@ -42,8 +54,7 @@ function requestParser(url, callback) {
         res.on("end", () => {
             parsedData = JSON.parse(body);
             callback(parsedData);
-        });
-        
+        });        
     });
 }
 

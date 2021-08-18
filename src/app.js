@@ -58,8 +58,7 @@ passport.deserializeUser(User.deserializeUser());
 
 var allCoinz = new Map();
 
-// false below is for the boolean "priceOnly"
-ccData.getAllCoinData(allCoinz, false);
+ccData.getAllCoinData(allCoinz);
 
 // --------------------------------- end init ---------------------------------
 
@@ -89,15 +88,14 @@ app.get("/app", (req, res) => {
     if (!req.isAuthenticated()) {
         res.redirect("/");
     } else {
-        // true below is for the boolean "priceOnly"
-        ccData.getAllCoinData(allCoinz, true);
-
         userHandler.fetchUserCoinMap(CoinSchema, req.user.username, allCoinz, (userCoinMap) => {
-            res.render("portfolio", {
-                coinz : userCoinMap,
-                allCoinz : allCoinz,
-                totalWorth : userHandler.totalWorth(userCoinMap),
-                totalGainz : userHandler.totalGainz(userCoinMap)
+            ccData.updatePrices(userCoinMap, () => {
+                res.render("portfolio", {
+                    coinz : userCoinMap,
+                    allCoinz : allCoinz,
+                    totalWorth : userHandler.totalWorth(userCoinMap),
+                    totalGainz : userHandler.totalGainz(userCoinMap)
+                });
             });
         });
         
